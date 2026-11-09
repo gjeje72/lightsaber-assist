@@ -21,6 +21,8 @@ namespace lightsaber_assist.WinUI
     {
         private const string ModelName = "yolo11n-pose";
         private const string ModelFileName = ModelName + ".onnx";
+        private const string AnalysisVersion = ModelName + "+saber1";
+        private readonly ISaberDetector saberDetector = new BrightSegmentDetector();
 
         private readonly Dictionary<int, FrameAnalysis> analyses = [];
         private readonly ObservableCollection<Annotation> annotations = [];
@@ -44,6 +46,7 @@ namespace lightsaber_assist.WinUI
             AnnotationTypeBox.SelectedIndex = 0;
             AnnotationList.ItemsSource = annotations;
             Overlay.SizeChanged += (_, _) => overlayDirty = true;
+            TimelineMarkers.SizeChanged += (_, _) => markersDirty = true;
             overlayTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
             overlayTimer.Tick += OverlayTimer_Tick;
             overlayTimer.Start();
@@ -54,6 +57,7 @@ namespace lightsaber_assist.WinUI
             analysisCts?.Cancel();
             videoPath = path;
             analyses.Clear();
+            markersDirty = true;
             annotations.Clear();
             realtimeAnalyzer = null;
             frameSource?.Dispose();
@@ -74,9 +78,11 @@ namespace lightsaber_assist.WinUI
 
             try
             {
-                var cached = await analysisCache.LoadAsync(path, ModelName, CancellationToken.None);
+                var cached = await analysisCache.LoadAsync(path, AnalysisVersion, CancellationToken.None);
                 if (cached is not null)
                 {
+                    ComputeThrust(cached.Frames);
+                    markersDirty = true;
                     foreach (var f in cached.Frames)
                     {
                         analyses[f.FrameIndex] = f;
@@ -155,8 +161,8 @@ namespace lightsaber_assist.WinUI
                 var source = EnsureFrameSource();
                 StatusText.Text = "Analyse en cours...";
                 var progress = new Progress<double>(v => AnalysisProgress.Value = v);
-                var result = await new VideoPreAnalyzer(source, det)
-                    .AnalyzeAsync(videoPath, ModelName, 1, progress, token);
+                var result = await new VideoPreAnalyzer(source, det, saberDetector)
+                    .AnalyzeAsync(videoPath, AnalysisVersion, 1, progress, token);
 
                 analyses.Clear();
                 foreach (var f in result.Frames)
@@ -165,10 +171,10 @@ namespace lightsaber_assist.WinUI
                 }
 
                 analysisStep = 1;
+                markersDirty = true;
                 overlayDirty = true;
                 result.Annotations = annotations.ToList();
-                await analysisCache.SaveAsync(result, CancellationToken.None);
-                StatusText.Text = $"Analyse termin\u00e9e ({result.Frames.Count} frames).";
+                await analysisCache.SaveAsync(result, CancellationToken.None);                StatusText.Text = $"Analyse termin\u00e9e ({result.Frames.Count} frames).";
             }
             catch (OperationCanceledException)
             {
@@ -233,6 +239,10 @@ namespace lightsaber_assist.WinUI
             }
 
             var index = CurrentFrameIndex();
+            if (markersDirty)
+            {
+                RefreshThrustMarkers();
+            }
             var analysis = Lookup(index);
 
             if (analysis is null && RealtimeToggle.IsOn && !realtimeBusy)
@@ -244,6 +254,7 @@ namespace lightsaber_assist.WinUI
                     if (analysis is not null)
                     {
                         analyses[index] = analysis;
+                        markersDirty = true;
                     }
                 }
                 catch (Exception ex)
@@ -274,7 +285,7 @@ namespace lightsaber_assist.WinUI
                 return null;
             }
 
-            realtimeAnalyzer ??= new FrameAnalyzer(det);
+            realtimeAnalyzer ??= new FrameAnalyzer(det, saberDetector);
             return realtimeAnalyzer.Analyze(frame);
         }
 
@@ -348,6 +359,20 @@ namespace lightsaber_assist.WinUI
                 {
                     AddDot(X(fighter.CenterOfGravity.X), Y(fighter.CenterOfGravity.Y), 6, new SolidColorBrush(Colors.Yellow));
                 }
+
+                if (ShowSabers.IsChecked == true && fighter.Saber is { } saber)
+                {
+                    Overlay.Children.Add(new Line
+                    {
+                        X1 = X(saber.Hilt.X),
+                        Y1 = Y(saber.Hilt.Y),
+                        X2 = X(saber.Tip.X),
+                        Y2 = Y(saber.Tip.Y),
+                        Stroke = brush,
+                        StrokeThickness = 4,
+                    });
+                    AddDot(X(saber.Hilt.X), Y(saber.Hilt.Y), 5, new SolidColorBrush(Colors.White));
+                }
             }
 
             if (ShowDistance.IsChecked == true && analysis.DistancePixels is { } px && analysis.Fighters.Count >= 2)
@@ -413,7 +438,7 @@ namespace lightsaber_assist.WinUI
                     Width = videoInfo?.Width ?? 0,
                     Height = videoInfo?.Height ?? 0,
                     Fps = videoInfo?.Fps ?? 0,
-                    ModelVersion = ModelName,
+                    ModelVersion = AnalysisVersion,
                     Frames = analyses.Values.OrderBy(f => f.FrameIndex).ToList(),
                     Annotations = annotations.ToList(),
                 };

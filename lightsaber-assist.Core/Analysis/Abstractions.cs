@@ -10,6 +10,11 @@ public interface IPoseDetector
     IReadOnlyList<(BoundingBox Box, Skeleton Skeleton)> Detect(RawFrame frame);
 }
 
+public interface ISaberDetector
+{
+    IReadOnlyList<SaberSegment> DetectSegments(RawFrame frame, IReadOnlyList<BoundingBox> searchAreas);
+}
+
 public interface IFrameSource : IDisposable
 {
     VideoInfo Info { get; }

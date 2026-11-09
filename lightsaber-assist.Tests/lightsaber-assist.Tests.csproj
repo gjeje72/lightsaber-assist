@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\lightsaber-assist.Core\lightsaber-assist.Core.csproj" />
+        <ProjectReference Include="..\lightsaber-assist.Vision\lightsaber-assist.Vision.csproj" />
   </ItemGroup>
 
 </Project>

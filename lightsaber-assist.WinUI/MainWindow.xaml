@@ -31,7 +31,10 @@
             <CheckBox x:Name="ShowBoxes" Content="Boîtes" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
             <CheckBox x:Name="ShowSkeleton" Content="Squelette" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
             <CheckBox x:Name="ShowCog" Content="Centre de gravité" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+            <CheckBox x:Name="ShowSabers" Content="Sabres" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
             <CheckBox x:Name="ShowDistance" Content="Distance" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+            <TextBlock Text="Seuil armé" VerticalAlignment="Center" />
+            <Slider x:Name="ThrustThreshold" Width="120" Minimum="10" Maximum="100" Value="60" StepFrequency="5" ValueChanged="ThrustThreshold_ValueChanged" IsTabStop="False" />
             <Button Content="Exporter JSON" Click="Export_Click" />
         </StackPanel>
         </ScrollViewer>
@@ -48,6 +51,7 @@
         <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
             <TextBlock x:Name="PositionText" Grid.Column="0" Text="00:00" VerticalAlignment="Center" />
             <Slider x:Name="SeekSlider" Grid.Column="1" Minimum="0" Maximum="1" ValueChanged="SeekSlider_ValueChanged" IsTabStop="False" />
+            <Canvas x:Name="TimelineMarkers" Grid.Column="1" Height="14" VerticalAlignment="Bottom" IsHitTestVisible="False" />
             <TextBlock x:Name="DurationText" Grid.Column="2" Text="00:00" VerticalAlignment="Center" />
         </Grid>
         <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">

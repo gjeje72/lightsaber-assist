@@ -7,11 +7,13 @@ public sealed class VideoPreAnalyzer
 {
     private readonly IFrameSource source;
     private readonly IPoseDetector detector;
+    private readonly ISaberDetector? saberDetector;
 
-    public VideoPreAnalyzer(IFrameSource source, IPoseDetector detector)
+    public VideoPreAnalyzer(IFrameSource source, IPoseDetector detector, ISaberDetector? saberDetector = null)
     {
         this.source = source;
         this.detector = detector;
+        this.saberDetector = saberDetector;
     }
 
     public async Task<AnalysisResult> AnalyzeAsync(
@@ -27,7 +29,7 @@ public sealed class VideoPreAnalyzer
             ModelVersion = modelVersion,
         };
 
-        var analyzer = new FrameAnalyzer(detector);
+        var analyzer = new FrameAnalyzer(detector, saberDetector);
         await foreach (var frame in source.ReadFramesAsync(step, cancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();

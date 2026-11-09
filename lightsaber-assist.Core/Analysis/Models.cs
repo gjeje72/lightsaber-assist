@@ -13,6 +13,11 @@ public readonly record struct PointF(float X, float Y);
 
 public readonly record struct Keypoint(float X, float Y, float Confidence);
 
+public readonly record struct SaberSegment(PointF Hilt, PointF Tip, float Confidence)
+{
+    public double Length => Math.Sqrt(Math.Pow(Tip.X - Hilt.X, 2) + Math.Pow(Tip.Y - Hilt.Y, 2));
+}
+
 public enum CocoKeypoint
 {
     Nose = 0,
@@ -65,6 +70,10 @@ public sealed class FighterFrame
     public Skeleton Skeleton { get; set; } = new();
 
     public PointF CenterOfGravity { get; set; }
+
+    public SaberSegment? Saber { get; set; }
+
+    public ThrustScores? Thrust { get; set; }
 }
 
 public sealed class FrameAnalysis

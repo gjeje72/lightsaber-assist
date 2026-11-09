@@ -67,8 +67,13 @@ public sealed class FrameAnalyzer
 {
     private readonly IPoseDetector detector;
     private readonly FighterTracker tracker = new();
+    private readonly ISaberDetector? saberDetector;
 
-    public FrameAnalyzer(IPoseDetector detector) => this.detector = detector;
+    public FrameAnalyzer(IPoseDetector detector, ISaberDetector? saberDetector = null)
+    {
+        this.detector = detector;
+        this.saberDetector = saberDetector;
+    }
 
     public void Reset() => tracker.Reset();
 
@@ -87,6 +92,22 @@ public sealed class FrameAnalyzer
         }
 
         FighterMetrics.ComputeDistance(analysis);
+
+        if (saberDetector is not null && analysis.Fighters.Count > 0)
+        {
+            var segments = saberDetector.DetectSegments(frame, analysis.Fighters.Select(f => f.Box).ToList());
+            var inputs = analysis.Fighters
+                .Select(f => (f.FighterId, f.Box, (IReadOnlyList<PointF>)GripResolver.Resolve(f.Skeleton, f.Box)))
+                .ToList();
+            var sabers = SaberAssociator.Associate(segments, inputs);
+            foreach (var f in analysis.Fighters)
+            {
+                f.Saber = sabers.TryGetValue(f.FighterId, out var s) ? s : null;
+            }
+
+            ThrustDetector.Apply(analysis);
+        }
+
         return analysis;
     }
 }
