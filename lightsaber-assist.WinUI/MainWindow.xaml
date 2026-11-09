@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="lightsaber_assist.WinUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:lightsaber_assist.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="lightsaber-assist.WinUI">
+
+    <Window.SystemBackdrop>
+        <MicaBackdrop />
+    </Window.SystemBackdrop>
+    <Grid RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="*,280" Padding="12" RowSpacing="8" ColumnSpacing="12">
+        <Grid.KeyboardAccelerators>
+            <KeyboardAccelerator Key="Space" Invoked="PlayPause_Accel" />
+            <KeyboardAccelerator Key="Left" Invoked="PrevFrame_Accel" />
+            <KeyboardAccelerator Key="Right" Invoked="NextFrame_Accel" />
+            <KeyboardAccelerator Key="Up" Invoked="SpeedUp_Accel" />
+            <KeyboardAccelerator Key="Down" Invoked="SpeedDown_Accel" />
+        </Grid.KeyboardAccelerators>
+        <StackPanel Grid.Row="0" Spacing="4">
+        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" HorizontalScrollMode="Enabled">
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Ouvrir une vidéo" Click="Open_Click" />
+            <Button x:Name="AnalyzeButton" Content="Analyser" Click="Analyze_Click" />
+            <Button x:Name="CancelButton" Content="Annuler" Click="CancelAnalysis_Click" IsEnabled="False" />
+            <ProgressBar x:Name="AnalysisProgress" Width="120" Minimum="0" Maximum="1" VerticalAlignment="Center" />
+            <ToggleSwitch x:Name="RealtimeToggle" OnContent="Temps réel" OffContent="Temps réel" Toggled="Realtime_Toggled" />
+            <CheckBox x:Name="ShowBoxes" Content="Boîtes" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+            <CheckBox x:Name="ShowSkeleton" Content="Squelette" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+            <CheckBox x:Name="ShowCog" Content="Centre de gravité" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+            <CheckBox x:Name="ShowDistance" Content="Distance" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+            <Button Content="Exporter JSON" Click="Export_Click" />
+        </StackPanel>
+        </ScrollViewer>
+        <TextBlock x:Name="StatusText" TextWrapping="Wrap" />
+        </StackPanel>
+        <ScrollViewer x:Name="ZoomHost" Grid.Row="1" ZoomMode="Enabled" MinZoomFactor="1" MaxZoomFactor="8"
+                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled">
+            <Grid Width="{Binding ViewportWidth, ElementName=ZoomHost}" Height="{Binding ViewportHeight, ElementName=ZoomHost}">
+                <MediaPlayerElement x:Name="Player" AreTransportControlsEnabled="False" AutoPlay="False" Stretch="Uniform" />
+                <Canvas x:Name="Overlay" IsHitTestVisible="False" />
+            </Grid>
+        </ScrollViewer>
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+            <TextBlock x:Name="PositionText" Grid.Column="0" Text="00:00" VerticalAlignment="Center" />
+            <Slider x:Name="SeekSlider" Grid.Column="1" Minimum="0" Maximum="1" ValueChanged="SeekSlider_ValueChanged" IsTabStop="False" />
+            <TextBlock x:Name="DurationText" Grid.Column="2" Text="00:00" VerticalAlignment="Center" />
+        </Grid>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+            <Button Content="Zoom -" Click="ZoomOut_Click" />
+            <Button Content="Zoom +" Click="ZoomIn_Click" />
+            <Button Content="Zoom 100%" Click="ZoomReset_Click" />
+            <Button Content="◀ Frame préc." Click="PrevFrame_Click" />
+            <Button x:Name="PlayPauseButton" Content="▶ Lecture" Click="PlayPause_Click" />
+            <Button Content="Frame suiv. ▶" Click="NextFrame_Click" />
+            <Button Content="x0.25" Click="Speed_Click" Tag="0.25" />
+            <Button Content="x0.5" Click="Speed_Click" Tag="0.5" />
+            <Button Content="x1" Click="Speed_Click" Tag="1" />
+        </StackPanel>
+        <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="4" RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="8">
+            <TextBlock Grid.Row="0" Text="Annotations" FontWeight="SemiBold" />
+            <ComboBox x:Name="AnnotationTypeBox" Grid.Row="1" HorizontalAlignment="Stretch" SelectedIndex="0" IsTabStop="False" />
+            <TextBox x:Name="AnnotationComment" Grid.Row="2" PlaceholderText="Commentaire (optionnel)" />
+            <ListView x:Name="AnnotationList" Grid.Row="3" IsItemClickEnabled="True" ItemClick="AnnotationList_ItemClick" />
+            <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8">
+                <Button Content="Ajouter" Click="AddAnnotation_Click" />
+                <Button Content="Supprimer" Click="DeleteAnnotation_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

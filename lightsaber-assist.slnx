@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="lightsaber-assist.WinUI/lightsaber-assist.WinUI.csproj" Id="47aa4b41-2f11-4fd7-bff9-7d31314344f9">
+    <Platform Project="x64" />
+    <Deploy />
+  </Project>
+  <Project Path="lightsaber-assist.Core/lightsaber-assist.Core.csproj" />
+  <Project Path="lightsaber-assist.Storage/lightsaber-assist.Storage.csproj" />
+  <Project Path="lightsaber-assist.Tests/lightsaber-assist.Tests.csproj" />
+  <Project Path="lightsaber-assist.Video/lightsaber-assist.Video.csproj" />
+  <Project Path="lightsaber-assist.Vision/lightsaber-assist.Vision.csproj" />
+</Solution>

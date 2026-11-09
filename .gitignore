@@ -1,0 +1,66 @@
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+## Build
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+ARM64/
+[Aa][Rr][Mm]64/
+publish/
+AppPackages/
+BundleArtifacts/
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+*.appxupload
+
+## NuGet
+*.nupkg
+*.snupkg
+packages/
+project.lock.json
+*.nuget.props
+*.nuget.targets
+
+## Tests / couverture
+TestResults/
+*.trx
+coverage/
+*.coverage
+*.coveragexml
+
+## Logs / diagnostics
+*.log
+*.binlog
+*.VisualState.xml
+
+## Outils
+.idea/
+.vscode/
+*.DotSettings.user
+_ReSharper*/
+.copilot/
+
+## Modèles exportés
+SaberAssistModels/
+
+## Windows
+Thumbs.db
+Desktop.ini
+
+## Binaires volumineux (à fournir localement, voir docs/ANALYSIS.md)
+lightsaber-assist.WinUI/Assets/Models/*.onnx
+lightsaber-assist.WinUI/Assets/Models/*.pt
+lightsaber-assist.WinUI/Assets/ffmpeg/*.exe
+lightsaber-assist.WinUI/Assets/ffmpeg/*.dll
+*.onnx

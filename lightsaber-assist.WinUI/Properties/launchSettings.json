@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "lightsaber-assist.WinUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "lightsaber-assist.WinUI (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
