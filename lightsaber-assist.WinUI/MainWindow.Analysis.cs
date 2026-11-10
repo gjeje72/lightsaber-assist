@@ -21,7 +21,7 @@ namespace lightsaber_assist.WinUI
     {
         private const string ModelName = "yolo11n-pose";
         private const string ModelFileName = ModelName + ".onnx";
-        private const string AnalysisVersion = ModelName + "+saber1";
+        private const string AnalysisVersion = ModelName + "+saber2";
         private readonly ISaberDetector saberDetector = new BrightSegmentDetector();
 
         private readonly Dictionary<int, FrameAnalysis> analyses = [];
@@ -52,6 +52,7 @@ namespace lightsaber_assist.WinUI
             overlayTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
             overlayTimer.Tick += OverlayTimer_Tick;
             overlayTimer.Start();
+            InitZone();
         }
 
         private async Task OnVideoOpenedAsync(string path)
@@ -62,6 +63,8 @@ namespace lightsaber_assist.WinUI
             markersDirty = true;
             annotations.Clear();
             realtimeAnalyzer = null;
+            fightZone = null;
+            calibrationPoints = null;
             frameSource?.Dispose();
             frameSource = null;
             videoInfo = null;
@@ -162,8 +165,33 @@ namespace lightsaber_assist.WinUI
                 var det = EnsureDetector();
                 var source = EnsureFrameSource();
                 StatusText.Text = "Analyse en cours...";
-                var progress = new Progress<double>(v => AnalysisProgress.Value = v);
-                var result = await new VideoPreAnalyzer(source, det, saberDetector)
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                double smoothedRate = 0, lastValue = 0, lastSeconds = 0;
+                var progress = new Progress<double>(v =>
+                {
+                    AnalysisProgress.Value = v;
+                    var elapsed = stopwatch.Elapsed.TotalSeconds;
+                    var dt = elapsed - lastSeconds;
+                    if (dt >= 0.5 && v > lastValue)
+                    {
+                        var rate = (v - lastValue) / dt;
+                        smoothedRate = smoothedRate == 0 ? rate : (0.8 * smoothedRate) + (0.2 * rate);
+                        lastValue = v;
+                        lastSeconds = elapsed;
+                    }
+
+                    var text = $"Analyse en cours... {v:P0}";
+                    if (v >= 0.02 && v < 1 && smoothedRate > 0 && elapsed >= 3)
+                    {
+                        var remaining = TimeSpan.FromSeconds((1 - v) / smoothedRate);
+                        text += remaining.TotalMinutes >= 1
+                            ? $" – ~{(int)remaining.TotalMinutes} min {remaining.Seconds:00} s restantes"
+                            : $" – ~{Math.Max(1, (int)Math.Ceiling(remaining.TotalSeconds))} s restantes";
+                    }
+
+                    StatusText.Text = text;
+                });
+                var result = await new VideoPreAnalyzer(source, det, saberDetector, fightZone)
                     .AnalyzeAsync(videoPath, AnalysisVersion, 1, progress, token);
 
                 analyses.Clear();
@@ -303,7 +331,7 @@ namespace lightsaber_assist.WinUI
                 return null;
             }
 
-            realtimeAnalyzer ??= new FrameAnalyzer(det, saberDetector);
+            realtimeAnalyzer ??= new FrameAnalyzer(det, saberDetector, fightZone);
             return realtimeAnalyzer.Analyze(frame);
         }
 
@@ -316,6 +344,7 @@ namespace lightsaber_assist.WinUI
             }
 
             DrawOverlayOn(Overlay, analysis, videoInfo.Width, videoInfo.Height);
+            DrawZoneOverlay();
         }
 
         private void DrawOverlayOn(Canvas Overlay, FrameAnalysis? analysis, int videoWidth, int videoHeight)

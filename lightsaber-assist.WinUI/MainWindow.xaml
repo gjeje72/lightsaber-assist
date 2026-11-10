@@ -62,6 +62,8 @@
                                 <CheckBox x:Name="ShowCog" Content="Centre de gravité" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
                                 <CheckBox x:Name="ShowSabers" Content="Sabres" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
                                 <CheckBox x:Name="ShowDistance" Content="Distance" IsChecked="True" Click="OverlayOption_Click" IsTabStop="False" />
+                                <Button Content="Définir la zone de combat..." Click="DefineZone_Click" Margin="0,8,0,0" HorizontalAlignment="Stretch" />
+                                <Button Content="Effacer la zone" Click="ClearZone_Click" HorizontalAlignment="Stretch" />
                                 <TextBlock Text="Seuil armé" Margin="0,8,0,0" />
                                 <Slider x:Name="ThrustThreshold" Minimum="10" Maximum="100" Value="60" StepFrequency="5"
                                         ValueChanged="ThrustThreshold_ValueChanged" IsTabStop="False" />
@@ -79,7 +81,7 @@
             <ScrollViewer x:Name="ZoomHost" Grid.Row="0" ZoomMode="Enabled" MinZoomFactor="1" MaxZoomFactor="8"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled">
-                <Grid Width="{Binding ViewportWidth, ElementName=ZoomHost}" Height="{Binding ViewportHeight, ElementName=ZoomHost}">
+                <Grid x:Name="VideoSurface" Width="{Binding ViewportWidth, ElementName=ZoomHost}" Height="{Binding ViewportHeight, ElementName=ZoomHost}" Background="Transparent">
                     <MediaPlayerElement x:Name="Player" AreTransportControlsEnabled="False" AutoPlay="False" Stretch="Uniform" />
                     <Canvas x:Name="Overlay" IsHitTestVisible="False" />
                 </Grid>
@@ -140,7 +142,7 @@
                 </Grid>
             </Border>
 
-            <Border x:Name="PlayerBar" Grid.Row="1">
+            <Border x:Name="PlayerBar" Grid.Row="1" Background="#E6202020" Padding="8,4">
                 <Border.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="Foreground" Value="White" />

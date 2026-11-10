@@ -6,8 +6,26 @@ namespace lightsaber_assist.Vision;
 public sealed class FighterTracker
 {
     private readonly Dictionary<int, PointF> lastCenters = [];
+    private int? maxIds;
 
-    public void Reset() => lastCenters.Clear();
+    public void Reset()
+    {
+        lastCenters.Clear();
+        maxIds = null;
+    }
+
+    /// <summary>Initialise les combattants à suivre (ids par X croissant) et interdit la création d'autres identifiants.</summary>
+    public void Seed(IReadOnlyList<PointF> seeds)
+    {
+        lastCenters.Clear();
+        var ordered = seeds.OrderBy(s => s.X).ToList();
+        for (var i = 0; i < ordered.Count; i++)
+        {
+            lastCenters[i] = ordered[i];
+        }
+
+        maxIds = ordered.Count > 0 ? ordered.Count : null;
+    }
 
     public List<(int Id, BoundingBox Box, Skeleton Skeleton)> Assign(IReadOnlyList<(BoundingBox Box, Skeleton Skeleton)> detections)
     {
@@ -54,6 +72,11 @@ public sealed class FighterTracker
         var nextId = lastCenters.Keys.Max() + 1;
         foreach (var det in remaining.Where(d => !usedDets.Contains(d)))
         {
+            if (maxIds is not null && lastCenters.Count >= maxIds)
+            {
+                break;
+            }
+
             result.Add((nextId, det.Box, det.Skeleton));
             lastCenters[nextId] = det.Box.Center;
             nextId++;
@@ -65,22 +88,50 @@ public sealed class FighterTracker
 
 public sealed class FrameAnalyzer
 {
+    private const int MaxFighters = 2;
     private readonly IPoseDetector detector;
     private readonly FighterTracker tracker = new();
     private readonly ISaberDetector? saberDetector;
 
-    public FrameAnalyzer(IPoseDetector detector, ISaberDetector? saberDetector = null)
+    private readonly FightZone? zone;
+
+    public FrameAnalyzer(IPoseDetector detector, ISaberDetector? saberDetector = null, FightZone? zone = null)
     {
         this.detector = detector;
         this.saberDetector = saberDetector;
+        this.zone = zone;
+        ApplySeeds();
     }
 
-    public void Reset() => tracker.Reset();
+    public void Reset()
+    {
+        tracker.Reset();
+        ApplySeeds();
+    }
+
+    private void ApplySeeds()
+    {
+        if (zone is { FighterSeeds.Count: > 0 })
+        {
+            tracker.Seed(zone.FighterSeeds);
+        }
+    }
 
     public FrameAnalysis Analyze(RawFrame frame)
     {
         var analysis = new FrameAnalysis { FrameIndex = frame.Index, Timestamp = frame.Timestamp };
-        foreach (var (id, box, skeleton) in tracker.Assign(detector.Detect(frame)))
+        IReadOnlyList<(BoundingBox Box, Skeleton Skeleton)> detections = detector.Detect(frame);
+        if (zone is not null)
+        {
+            detections = detections.Where(d => zone.ContainsFeet(d.Box)).ToList();
+        }
+
+        if (zone is not { FighterSeeds.Count: > 0 })
+        {
+            detections = detections.OrderByDescending(d => d.Box.Confidence).Take(MaxFighters).ToList();
+        }
+
+        foreach (var (id, box, skeleton) in tracker.Assign(detections))
         {
             analysis.Fighters.Add(new FighterFrame
             {
@@ -96,6 +147,10 @@ public sealed class FrameAnalyzer
         if (saberDetector is not null && analysis.Fighters.Count > 0)
         {
             var segments = saberDetector.DetectSegments(frame, analysis.Fighters.Select(f => f.Box).ToList());
+            if (zone is not null)
+            {
+                segments = segments.Where(s => !zone.IsAlongRing(s)).ToList();
+            }
             var inputs = analysis.Fighters
                 .Select(f => (f.FighterId, f.Box, (IReadOnlyList<PointF>)GripResolver.Resolve(f.Skeleton, f.Box)))
                 .ToList();

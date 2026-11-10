@@ -17,7 +17,7 @@ public sealed class YoloPoseDetector : IPoseDetector, IDisposable
     private readonly float nmsThreshold;
     private readonly int maxFighters;
 
-    public YoloPoseDetector(string modelPath, float scoreThreshold = 0.4f, float nmsThreshold = 0.5f, int maxFighters = 2)
+    public YoloPoseDetector(string modelPath, float scoreThreshold = 0.25f, float nmsThreshold = 0.5f, int maxFighters = 10)
     {
         if (!File.Exists(modelPath))
         {

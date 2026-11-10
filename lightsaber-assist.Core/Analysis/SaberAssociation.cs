@@ -39,6 +39,7 @@ public static class SaberAssociator
 {
     public const double MaxGripDistanceRatio = 0.4;
     public const double MinLengthRatio = 0.25;
+    public const double BodyMarginRatio = 0.25;
 
     public static Dictionary<int, SaberSegment> Associate(
         IReadOnlyList<SaberSegment> segments,
@@ -100,6 +101,67 @@ public static class SaberAssociator
             usedSegs.Add(c.Seg);
         }
 
+        FallbackByBody(segments, fighters, result, usedSegs);
         return result;
+    }
+
+    /// <summary>
+    /// Pour les combattants sans sabre associ\u00e9 (main arm\u00e9e masqu\u00e9e par le corps) :
+    /// on retient le segment libre dont une extr\u00e9mit\u00e9 est dans ou contre la bo\u00eete du combattant.
+    /// </summary>
+    private static void FallbackByBody(
+        IReadOnlyList<SaberSegment> segments,
+        IReadOnlyList<(int FighterId, BoundingBox Box, IReadOnlyList<PointF> Grips)> fighters,
+        Dictionary<int, SaberSegment> result,
+        HashSet<int> usedSegs)
+    {
+        var candidates = new List<(int Id, int Seg, double Score, bool Flip)>();
+        foreach (var (id, box, _) in fighters)
+        {
+            if (result.ContainsKey(id) || box.Height <= 0)
+            {
+                continue;
+            }
+
+            for (var s = 0; s < segments.Count; s++)
+            {
+                var seg = segments[s];
+                if (usedSegs.Contains(s) || seg.Length < MinLengthRatio * box.Height)
+                {
+                    continue;
+                }
+
+                var dh = DistanceToBox(seg.Hilt, box);
+                var dt = DistanceToBox(seg.Tip, box);
+                var best = Math.Min(dh, dt);
+                if (best > BodyMarginRatio * box.Height)
+                {
+                    continue;
+                }
+
+                var center = box.Center;
+                var flip = FighterMetrics.DistancePixels(seg.Tip, center) < FighterMetrics.DistancePixels(seg.Hilt, center);
+                candidates.Add((id, s, best, flip));
+            }
+        }
+
+        foreach (var c in candidates.OrderBy(c => c.Score))
+        {
+            if (result.ContainsKey(c.Id) || usedSegs.Contains(c.Seg))
+            {
+                continue;
+            }
+
+            var seg = segments[c.Seg];
+            result[c.Id] = c.Flip ? seg with { Hilt = seg.Tip, Tip = seg.Hilt } : seg;
+            usedSegs.Add(c.Seg);
+        }
+    }
+
+    private static double DistanceToBox(PointF p, BoundingBox box)
+    {
+        var dx = Math.Max(Math.Max(box.X - p.X, 0), p.X - box.Right);
+        var dy = Math.Max(Math.Max(box.Y - p.Y, 0), p.Y - box.Bottom);
+        return Math.Sqrt((dx * dx) + (dy * dy));
     }
 }

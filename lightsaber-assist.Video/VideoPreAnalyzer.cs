@@ -8,12 +8,14 @@ public sealed class VideoPreAnalyzer
     private readonly IFrameSource source;
     private readonly IPoseDetector detector;
     private readonly ISaberDetector? saberDetector;
+    private readonly FightZone? zone;
 
-    public VideoPreAnalyzer(IFrameSource source, IPoseDetector detector, ISaberDetector? saberDetector = null)
+    public VideoPreAnalyzer(IFrameSource source, IPoseDetector detector, ISaberDetector? saberDetector = null, FightZone? zone = null)
     {
         this.source = source;
         this.detector = detector;
         this.saberDetector = saberDetector;
+        this.zone = zone;
     }
 
     public async Task<AnalysisResult> AnalyzeAsync(
@@ -29,7 +31,7 @@ public sealed class VideoPreAnalyzer
             ModelVersion = modelVersion,
         };
 
-        var analyzer = new FrameAnalyzer(detector, saberDetector);
+        var analyzer = new FrameAnalyzer(detector, saberDetector, zone);
         await foreach (var frame in source.ReadFramesAsync(step, cancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
