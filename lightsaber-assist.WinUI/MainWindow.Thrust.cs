@@ -23,15 +23,18 @@ namespace lightsaber_assist.WinUI
         {
             markersDirty = false;
             TimelineMarkers.Children.Clear();
+            var maxGap = Math.Max(analysisStep * 3, 3);
+            var events = analyses.Count == 0
+                ? new System.Collections.Generic.List<ThrustEvent>()
+                : ThrustEventBuilder.Build(analyses.Values, ThrustThreshold.Value / 100.0, maxGap).ToList();
+            RebuildEntries(events);
             var width = TimelineMarkers.ActualWidth;
             var duration = SeekSlider.Maximum;
-            if (width <= 0 || duration <= 1 || analyses.Count == 0)
+            if (width <= 0 || duration <= 1 || events.Count == 0)
             {
                 return;
             }
 
-            var maxGap = Math.Max(analysisStep * 3, 3);
-            var events = ThrustEventBuilder.Build(analyses.Values, ThrustThreshold.Value / 100.0, maxGap);
             foreach (var ev in events)
             {
                 var x = ev.Start.TotalMilliseconds / duration * width;
@@ -49,6 +52,61 @@ namespace lightsaber_assist.WinUI
                 Canvas.SetLeft(marker, x);
                 Canvas.SetTop(marker, 2);
                 TimelineMarkers.Children.Add(marker);
+            }
+        }
+
+        private static string Label(AnnotationType type) => type switch
+        {
+            AnnotationType.ArmeEngagement => "Armé d'engagement",
+            AnnotationType.ArmeSimple => "Armé simple",
+            AnnotationType.Touche => "Touche",
+            _ => type.ToString(),
+        };
+
+        private static Color ColorOf(AnnotationType type) => type switch
+        {
+            AnnotationType.ArmeEngagement => EngagementColor,
+            AnnotationType.Touche => Colors.IndianRed,
+            _ => SimpleColor,
+        };
+
+        private void RebuildEntries(System.Collections.Generic.IEnumerable<ThrustEvent> events)
+        {
+            var list = new System.Collections.Generic.List<TimelineEntry>();
+            foreach (var a in annotations)
+            {
+                list.Add(new TimelineEntry(a.Timestamp, Label(a.Type),
+                    string.IsNullOrWhiteSpace(a.Comment) ? $"Annotation - image {a.FrameIndex}" : $"Annotation - image {a.FrameIndex} - {a.Comment}",
+                    new SolidColorBrush(ColorOf(a.Type)), a));
+            }
+
+            foreach (var ev in events)
+            {
+                var span = (ev.End - ev.Start).TotalSeconds;
+                list.Add(new TimelineEntry(ev.Start, Label(ev.Type),
+                    $"Détecté - combattant {ev.FighterId + 1} - {ev.Confidence:P0} - durée {span:0.0} s (images {ev.StartFrame}-{ev.EndFrame})",
+                    new SolidColorBrush(ColorOf(ev.Type)), null));
+            }
+
+            var sorted = list.OrderBy(i => i.Timestamp).ToList();
+            var common = 0;
+            while (common < entries.Count && common < sorted.Count
+                && entries[common].Timestamp == sorted[common].Timestamp
+                && entries[common].Title == sorted[common].Title
+                && entries[common].Detail == sorted[common].Detail
+                && ReferenceEquals(entries[common].Annotation, sorted[common].Annotation))
+            {
+                common++;
+            }
+
+            while (entries.Count > common)
+            {
+                entries.RemoveAt(entries.Count - 1);
+            }
+
+            for (var i = common; i < sorted.Count; i++)
+            {
+                entries.Add(sorted[i]);
             }
         }
 

@@ -21,6 +21,8 @@ namespace lightsaber_assist.WinUI
             Player.SetMediaPlayer(mediaPlayer);
             mediaPlayer.PlaybackSession.PlaybackStateChanged += (s, _) =>
                 DispatcherQueue.TryEnqueue(UpdatePlayPauseButton);
+            mediaPlayer.PlaybackSession.PlaybackRateChanged += (s, _) =>
+                DispatcherQueue.TryEnqueue(() => UpdateSpeedUi(s.PlaybackRate));
             mediaPlayer.PlaybackSession.NaturalDurationChanged += (s, _) =>
                 DispatcherQueue.TryEnqueue(() =>
                 {
@@ -46,6 +48,16 @@ namespace lightsaber_assist.WinUI
 
         private void SeekSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
+            if (replayMode)
+            {
+                if (!updatingSlider)
+                {
+                    SeekReplay(TimeSpan.FromMilliseconds(e.NewValue));
+                }
+
+                return;
+            }
+
             if (!updatingSlider && Player.MediaPlayer is { } mp)
             {
                 mp.PlaybackSession.Position = TimeSpan.FromMilliseconds(e.NewValue);
@@ -61,18 +73,28 @@ namespace lightsaber_assist.WinUI
 
         private void ZoomReset_Click(object sender, RoutedEventArgs e) => ZoomHost.ChangeView(0, 0, 1f);
 
-        private static readonly double[] Speeds = { 0.25, 0.5, 1.0 };
+        private static readonly double[] Speeds = { 0.25, 0.5, 1.0, 1.5, 2.0 };
 
         private void UpdatePlayPauseButton()
         {
+            if (replayMode)
+            {
+                PlayPauseIcon.Glyph = replayPlaying ? "\uE769" : "\uE768";
+                return;
+            }
             var state = Player.MediaPlayer?.PlaybackSession.PlaybackState;
-            PlayPauseButton.Content = state == Windows.Media.Playback.MediaPlaybackState.Playing
-                ? "\u23F8 Pause"
-                : "\u25B6 Lecture";
+            PlayPauseIcon.Glyph = state == Windows.Media.Playback.MediaPlaybackState.Playing
+                ? "\uE769"
+                : "\uE768";
         }
 
         private void TogglePlayPause()
         {
+            if (replayMode)
+            {
+                ToggleReplayPlay();
+                return;
+            }
             var mp = Player.MediaPlayer;
             if (mp is null)
             {
@@ -90,6 +112,11 @@ namespace lightsaber_assist.WinUI
 
         private void ChangeSpeed(int delta)
         {
+            if (replayMode)
+            {
+                ChangeReplaySpeed(delta);
+                return;
+            }
             var session = Player.MediaPlayer?.PlaybackSession;
             if (session is null)
             {
@@ -131,27 +158,36 @@ namespace lightsaber_assist.WinUI
             {
                 return;
             }
-            Player.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(file);
-            await OnVideoOpenedAsync(file.Path);
+            await OpenVideoFileAsync(file);
         }
 
         private void NextFrame_Click(object sender, RoutedEventArgs e)
         {
+            if (replayMode)
+            {
+                StepReplay(1);
+                return;
+            }
             Player.MediaPlayer?.Pause();
             Player.MediaPlayer?.StepForwardOneFrame();
         }
 
         private void PrevFrame_Click(object sender, RoutedEventArgs e)
         {
+            if (replayMode)
+            {
+                StepReplay(-1);
+                return;
+            }
             Player.MediaPlayer?.Pause();
             Player.MediaPlayer?.StepBackwardOneFrame();
         }
 
         private void Speed_Click(object sender, RoutedEventArgs e)
         {
-            if (Player.MediaPlayer is not null && sender is Button { Tag: string tag })
+            if (sender is Button { Tag: string tag })
             {
-                Player.MediaPlayer.PlaybackSession.PlaybackRate = double.Parse(tag, System.Globalization.CultureInfo.InvariantCulture);
+                SetRate(double.Parse(tag, System.Globalization.CultureInfo.InvariantCulture));
             }
         }
     }

@@ -1,4 +1,4 @@
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -26,6 +26,7 @@ namespace lightsaber_assist.WinUI
 
         private readonly Dictionary<int, FrameAnalysis> analyses = [];
         private readonly ObservableCollection<Annotation> annotations = [];
+        private readonly ObservableCollection<TimelineEntry> entries = [];
         private readonly IAnalysisCache analysisCache = new JsonAnalysisCache();
         private readonly IAnnotationStore annotationStore = new JsonAnnotationStore();
         private DispatcherTimer? overlayTimer;
@@ -44,7 +45,8 @@ namespace lightsaber_assist.WinUI
         {
             AnnotationTypeBox.ItemsSource = Enum.GetValues<AnnotationType>();
             AnnotationTypeBox.SelectedIndex = 0;
-            AnnotationList.ItemsSource = annotations;
+            AnnotationList.ItemsSource = entries;
+            annotations.CollectionChanged += (_, _) => markersDirty = true;
             Overlay.SizeChanged += (_, _) => overlayDirty = true;
             TimelineMarkers.SizeChanged += (_, _) => markersDirty = true;
             overlayTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(33) };
@@ -195,8 +197,24 @@ namespace lightsaber_assist.WinUI
 
         private void Realtime_Toggled(object sender, RoutedEventArgs e)
         {
+            liveAnalyze = RealtimeToggle.IsOn;
             if (!RealtimeToggle.IsOn)
             {
+                return;
+            }
+
+            if (liveSessions.Count > 0)
+            {
+                try
+                {
+                    EnsureDetector();
+                }
+                catch (Exception ex)
+                {
+                    StatusText.Text = ex.Message;
+                    RealtimeToggle.IsOn = false;
+                }
+
                 return;
             }
 
@@ -291,8 +309,19 @@ namespace lightsaber_assist.WinUI
 
         private void DrawOverlay(FrameAnalysis? analysis)
         {
+            if (videoInfo is null)
+            {
+                Overlay.Children.Clear();
+                return;
+            }
+
+            DrawOverlayOn(Overlay, analysis, videoInfo.Width, videoInfo.Height);
+        }
+
+        private void DrawOverlayOn(Canvas Overlay, FrameAnalysis? analysis, int videoWidth, int videoHeight)
+        {
             Overlay.Children.Clear();
-            if (analysis is null || videoInfo is null)
+            if (analysis is null)
             {
                 return;
             }
@@ -303,15 +332,23 @@ namespace lightsaber_assist.WinUI
                 return;
             }
 
-            var scale = Math.Min(cw / videoInfo.Width, ch / videoInfo.Height);
-            var offX = (cw - videoInfo.Width * scale) / 2;
-            var offY = (ch - videoInfo.Height * scale) / 2;
+            var scale = Math.Min(cw / videoWidth, ch / videoHeight);
+            var offX = (cw - videoWidth * scale) / 2;
+            var offY = (ch - videoHeight * scale) / 2;
             double X(float x) => offX + x * scale;
             double Y(float y) => offY + y * scale;
 
             foreach (var fighter in analysis.Fighters)
             {
                 var brush = new SolidColorBrush(fighter.FighterId == 0 ? Colors.OrangeRed : Colors.DeepSkyBlue);
+
+                if (fighter.FighterId < fighterNames.Length && !string.IsNullOrWhiteSpace(fighterNames[fighter.FighterId]))
+                {
+                    var nameLabel = new TextBlock { Text = fighterNames[fighter.FighterId], Foreground = brush, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
+                    Canvas.SetLeft(nameLabel, X(fighter.Box.X));
+                    Canvas.SetTop(nameLabel, Y(fighter.Box.Y) - 22);
+                    Overlay.Children.Add(nameLabel);
+                }
 
                 if (ShowBoxes.IsChecked == true)
                 {
@@ -351,13 +388,13 @@ namespace lightsaber_assist.WinUI
 
                     foreach (var k in fighter.Skeleton.Keypoints.Where(k => k.Confidence >= FighterMetrics.MinConfidence))
                     {
-                        AddDot(X(k.X), Y(k.Y), 3, brush);
+                        AddDot(Overlay, X(k.X), Y(k.Y), 3, brush);
                     }
                 }
 
                 if (ShowCog.IsChecked == true)
                 {
-                    AddDot(X(fighter.CenterOfGravity.X), Y(fighter.CenterOfGravity.Y), 6, new SolidColorBrush(Colors.Yellow));
+                    AddDot(Overlay, X(fighter.CenterOfGravity.X), Y(fighter.CenterOfGravity.Y), 6, new SolidColorBrush(Colors.Yellow));
                 }
 
                 if (ShowSabers.IsChecked == true && fighter.Saber is { } saber)
@@ -371,7 +408,7 @@ namespace lightsaber_assist.WinUI
                         Stroke = brush,
                         StrokeThickness = 4,
                     });
-                    AddDot(X(saber.Hilt.X), Y(saber.Hilt.Y), 5, new SolidColorBrush(Colors.White));
+                    AddDot(Overlay, X(saber.Hilt.X), Y(saber.Hilt.Y), 5, new SolidColorBrush(Colors.White));
                 }
             }
 
@@ -402,7 +439,7 @@ namespace lightsaber_assist.WinUI
             }
         }
 
-        private void AddDot(double x, double y, double radius, Brush brush)
+        private static void AddDot(Canvas Overlay, double x, double y, double radius, Brush brush)
         {
             var dot = new Ellipse { Width = radius * 2, Height = radius * 2, Fill = brush };
             Canvas.SetLeft(dot, x - radius);
@@ -479,7 +516,7 @@ namespace lightsaber_assist.WinUI
 
         private async void DeleteAnnotation_Click(object sender, RoutedEventArgs e)
         {
-            if (AnnotationList.SelectedItem is Annotation selected)
+            if (AnnotationList.SelectedItem is TimelineEntry { Annotation: { } selected })
             {
                 annotations.Remove(selected);
                 await SaveAnnotationsAsync();
@@ -488,7 +525,7 @@ namespace lightsaber_assist.WinUI
 
         private void AnnotationList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            if (e.ClickedItem is Annotation a && Player.MediaPlayer is { } mp)
+            if (e.ClickedItem is TimelineEntry a && Player.MediaPlayer is { } mp)
             {
                 mp.Pause();
                 mp.PlaybackSession.Position = a.Timestamp;
