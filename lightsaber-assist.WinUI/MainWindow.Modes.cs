@@ -40,11 +40,10 @@ namespace lightsaber_assist.WinUI
 
             try
             {
-                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true, Converters = { new JsonStringEnumConverter() } };
                 AnalysisResult result;
                 await using (var stream = System.IO.File.OpenRead(file.Path))
                 {
-                    result = await JsonSerializer.DeserializeAsync<AnalysisResult>(stream, options)
+                    result = await JsonSerializer.DeserializeAsync(stream, AnalysisJsonContext.Default.AnalysisResult)
                         ?? throw new InvalidOperationException("Fichier d'analyse invalide.");
                 }
 
