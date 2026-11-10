@@ -1,0 +1,521 @@
+{
+  "settings": {
+    "components": {
+      "code": true,
+      "binaries": false
+    },
+    "targetId": "net10.0",
+    "targetDisplayName": ".NETCoreApp,Version=v10.0"
+  },
+  "analysisStartTime": "2026-11-10T10:43:39.0302581Z",
+  "analysisEndTime": "2026-11-10T10:43:45.917922Z",
+  "privacyModeHelpUrl": "https://go.microsoft.com/fwlink/?linkid=2270980",
+  "stats": {
+    "summary": {
+      "projects": 6,
+      "issues": 3,
+      "incidents": 11,
+      "effort": 11
+    },
+    "charts": {
+      "severity": {
+        "Mandatory": 5,
+        "Optional": 0,
+        "Potential": 6,
+        "Information": 0
+      },
+      "category": {
+        "Project": 5,
+        "Api": 6
+      }
+    }
+  },
+  "projects": [
+    {
+      "path": "lightsaber-assist.Core\\lightsaber-assist.Core.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "lightsaber-assist.Core",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 9,
+        "numberOfCodeFiles": 9,
+        "linesTotal": 542,
+        "linesOfCode": 542,
+        "totalApiScanned": 740,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "3be7a3fa-1b63-4510-9532-ef5a9abe23e5",
+          "ruleId": "Project.0002",
+          "projectPath": "lightsaber-assist.Core\\lightsaber-assist.Core.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+              "protected": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Core\\lightsaber-assist.Core.csproj",
+            "snippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "protectedSnippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "lightsaber-assist.Storage\\lightsaber-assist.Storage.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "lightsaber-assist.Storage",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 1,
+        "numberOfCodeFiles": 1,
+        "linesTotal": 93,
+        "linesOfCode": 93,
+        "totalApiScanned": 144,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "a4bfc950-fdf0-4c36-a273-50c81a8856fd",
+          "ruleId": "Project.0002",
+          "projectPath": "lightsaber-assist.Storage\\lightsaber-assist.Storage.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+              "protected": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Storage\\lightsaber-assist.Storage.csproj",
+            "snippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "protectedSnippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "lightsaber-assist.Tests\\lightsaber-assist.Tests.csproj",
+      "startingProject": true,
+      "issues": 0,
+      "storyPoints": 0,
+      "properties": {
+        "appName": "lightsaber-assist.Tests",
+        "projectKind": "DotNetCoreApp",
+        "frameworks": [
+          "net10.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 6,
+        "numberOfCodeFiles": 4,
+        "linesTotal": 2027,
+        "linesOfCode": 232,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [],
+      "features": []
+    },
+    {
+      "path": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+      "startingProject": true,
+      "issues": 3,
+      "storyPoints": 7,
+      "properties": {
+        "appName": "lightsaber-assist.Video",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 2,
+        "numberOfCodeFiles": 2,
+        "linesTotal": 216,
+        "linesOfCode": 216,
+        "totalApiScanned": 306,
+        "minLinesOfCodeToChange": 6,
+        "maxLinesOfCodeToChange": 6
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "fbeb8d0d-7f33-487e-a94e-492dd94d413a",
+          "ruleId": "Project.0002",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+              "protected": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+            "snippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "protectedSnippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        },
+        {
+          "incidentId": "e7211a52-c60a-41d8-890a-cd54ebdbf2e2",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var duration = s.TryGetProperty(\u0022duration\u0022, out var d) \u0026\u0026 double.TryParse(d.GetString(), CultureInfo.InvariantCulture, out var sec)\r\n            ? TimeSpan.FromSeconds(sec)\r\n            : TimeSpan.FromSeconds(frames / fps);",
+              "protected": "M:System.TimeSpan.FromSeconds(System.Double)"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\FFmpegFrameSource.cs",
+            "snippet": "var duration = s.TryGetProperty(\u0022duration\u0022, out var d) \u0026\u0026 double.TryParse(d.GetString(), CultureInfo.InvariantCulture, out var sec)\r\n            ? TimeSpan.FromSeconds(sec)\r\n            : TimeSpan.FromSeconds(frames / fps);",
+            "protectedSnippet": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "label": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "links": [
+              {
+                "title": "Documentation sur les API",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 167,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "41820974-14f6-4b8e-8071-5062919cf06e",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "var duration = s.TryGetProperty(\u0022duration\u0022, out var d) \u0026\u0026 double.TryParse(d.GetString(), CultureInfo.InvariantCulture, out var sec)\r\n            ? TimeSpan.FromSeconds(sec)\r\n            : TimeSpan.FromSeconds(frames / fps);",
+              "protected": "M:System.TimeSpan.FromSeconds(System.Double)"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\FFmpegFrameSource.cs",
+            "snippet": "var duration = s.TryGetProperty(\u0022duration\u0022, out var d) \u0026\u0026 double.TryParse(d.GetString(), CultureInfo.InvariantCulture, out var sec)\r\n            ? TimeSpan.FromSeconds(sec)\r\n            : TimeSpan.FromSeconds(frames / fps);",
+            "protectedSnippet": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "label": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "links": [
+              {
+                "title": "Documentation sur les API",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 167,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "39c3c18c-561d-4294-a4bc-83295cdcd4b4",
+          "ruleId": "Api.0003",
+          "description": "Nullable JsonDocument properties deserialize to JsonValueKind.Null ",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "using var doc = JsonDocument.Parse(json);",
+              "protected": "T:System.Text.Json.JsonDocument"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\FFmpegFrameSource.cs",
+            "snippet": "using var doc = JsonDocument.Parse(json);",
+            "protectedSnippet": "T:System.Text.Json.JsonDocument",
+            "label": "T:System.Text.Json.JsonDocument",
+            "links": [
+              {
+                "title": "Documentation sur les API",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/serialization/9.0/jsondocument-props.md",
+                "isCustom": false
+              }
+            ],
+            "line": 160,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "f56a5470-ac6d-463c-978a-b8b150e22265",
+          "ruleId": "Api.0003",
+          "description": "Nullable JsonDocument properties deserialize to JsonValueKind.Null ",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "using var doc = JsonDocument.Parse(json);",
+              "protected": "T:System.Text.Json.JsonDocument"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\FFmpegFrameSource.cs",
+            "snippet": "using var doc = JsonDocument.Parse(json);",
+            "protectedSnippet": "T:System.Text.Json.JsonDocument",
+            "label": "T:System.Text.Json.JsonDocument",
+            "links": [
+              {
+                "title": "Documentation sur les API",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/serialization/9.0/jsondocument-props.md",
+                "isCustom": false
+              }
+            ],
+            "line": 160,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "7e2c2302-45ca-4e49-bfae-24595ba546f1",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "return new RawFrame(frameIndex, TimeSpan.FromSeconds(frameIndex / Info.Fps), Info.Width, Info.Height, buffer);",
+              "protected": "M:System.TimeSpan.FromSeconds(System.Double)"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\FFmpegFrameSource.cs",
+            "snippet": "return new RawFrame(frameIndex, TimeSpan.FromSeconds(frameIndex / Info.Fps), Info.Width, Info.Height, buffer);",
+            "protectedSnippet": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "label": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "links": [
+              {
+                "title": "Documentation sur les API",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 108,
+            "column": 8
+          }
+        },
+        {
+          "incidentId": "6152611f-87e5-4d4b-be4a-755ffd07818e",
+          "ruleId": "Api.0002",
+          "description": "Breaking change: New TimeSpan.From*() overloads that take integers ",
+          "projectPath": "lightsaber-assist.Video\\lightsaber-assist.Video.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "yield return new RawFrame(index, TimeSpan.FromSeconds(index / Info.Fps), Info.Width, Info.Height, buffer);",
+              "protected": "M:System.TimeSpan.FromSeconds(System.Double)"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Video\\FFmpegFrameSource.cs",
+            "snippet": "yield return new RawFrame(index, TimeSpan.FromSeconds(index / Info.Fps), Info.Width, Info.Height, buffer);",
+            "protectedSnippet": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "label": "M:System.TimeSpan.FromSeconds(System.Double)",
+            "links": [
+              {
+                "title": "Documentation sur les API",
+                "url": "https://github.com/dotnet/docs/blob/main/docs/core/compatibility/core-libraries/9.0/timespan-from-overloads.md",
+                "isCustom": false
+              }
+            ],
+            "line": 76,
+            "column": 16
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "lightsaber-assist.Vision\\lightsaber-assist.Vision.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "lightsaber-assist.Vision",
+        "projectKind": "ClassLibrary",
+        "frameworks": [
+          "net8.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 3,
+        "numberOfCodeFiles": 3,
+        "linesTotal": 385,
+        "linesOfCode": 385,
+        "totalApiScanned": 632,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "d6ba2c70-04d0-4d2a-8cf5-da8aefe8dcc8",
+          "ruleId": "Project.0002",
+          "projectPath": "lightsaber-assist.Vision\\lightsaber-assist.Vision.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+              "protected": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.Vision\\lightsaber-assist.Vision.csproj",
+            "snippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "protectedSnippet": "Infrastructure cible actuelle: net8.0\nInfrastructure cible recommand\u00E9: net10.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0",
+              "RecommendedTargetFramework": "net10.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    },
+    {
+      "path": "lightsaber-assist.WinUI\\lightsaber-assist.WinUI.csproj",
+      "startingProject": true,
+      "issues": 1,
+      "storyPoints": 1,
+      "properties": {
+        "appName": "lightsaber-assist.WinUI",
+        "projectKind": "WinForms",
+        "frameworks": [
+          "net8.0-windows10.0.19041.0"
+        ],
+        "languages": [
+          "C#"
+        ],
+        "tools": [
+          "MSBuild"
+        ],
+        "isSdkStyle": true,
+        "numberOfFiles": 34,
+        "numberOfCodeFiles": 11,
+        "linesTotal": 8575151,
+        "linesOfCode": 2201,
+        "totalApiScanned": 0,
+        "minLinesOfCodeToChange": 0,
+        "maxLinesOfCodeToChange": 0
+      },
+      "ruleInstances": [
+        {
+          "incidentId": "b656ef87-e608-489c-93b4-705b70fdb346",
+          "ruleId": "Project.0002",
+          "projectPath": "lightsaber-assist.WinUI\\lightsaber-assist.WinUI.csproj",
+          "state": "Active",
+          "location": {
+            "snippetModel": {
+              "unrestricted": "Infrastructure cible actuelle: net8.0-windows10.0.19041.0\nInfrastructure cible recommand\u00E9: net10.0-windows10.0.22000.0",
+              "protected": "Infrastructure cible actuelle: net8.0-windows10.0.19041.0\nInfrastructure cible recommand\u00E9: net10.0-windows10.0.22000.0"
+            },
+            "kind": "File",
+            "path": "lightsaber-assist.WinUI\\lightsaber-assist.WinUI.csproj",
+            "snippet": "Infrastructure cible actuelle: net8.0-windows10.0.19041.0\nInfrastructure cible recommand\u00E9: net10.0-windows10.0.22000.0",
+            "protectedSnippet": "Infrastructure cible actuelle: net8.0-windows10.0.19041.0\nInfrastructure cible recommand\u00E9: net10.0-windows10.0.22000.0",
+            "properties": {
+              "CurrentTargetFramework": "net8.0-windows10.0.19041.0",
+              "RecommendedTargetFramework": "net10.0-windows10.0.22000.0"
+            }
+          }
+        }
+      ],
+      "features": []
+    }
+  ],
+  "rules": {
+    "Project.0002": {
+      "id": "Project.0002",
+      "isFeature": false,
+      "description": "Le ou les infrastructures cibles du projet doivent \u00EAtre remplac\u00E9es par la nouvelle infrastructure cible que vous avez s\u00E9lectionn\u00E9e pour cette mise \u00E0 niveau.\n\nPendant la mise \u00E0 niveau, l\u2019infrastructure cible est ajust\u00E9e en fonction de la plateforme correspondante, le cas \u00E9ch\u00E9ant. Dans certains cas, le projet entra\u00EEnera plusieurs infrastructures cibles apr\u00E8s la mise \u00E0 niveau s\u2019il utilisait des fonctionnalit\u00E9s qui ont d\u00E9sormais leurs propres plateformes dans les infrastructures .NET modernes (Windows, iOS, Android, etc.).",
+      "label": "Le ou les frameworks cibles du projet doivent \u00EAtre modifi\u00E9s",
+      "severity": "Mandatory",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Vue d\u2019ensemble du transfert de .NET Framework vers .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265227",
+          "isCustom": false
+        },
+        {
+          "title": "Kits de d\u00E9veloppement logiciel (SDK) de projet .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2265226",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0002": {
+      "id": "Api.0002",
+      "isFeature": false,
+      "description": "L\u2019API est incompatible au niveau du code source pour la version .NET s\u00E9lectionn\u00E9e\u00A0: des modifications du code sont n\u00E9cessaires pour compiler avec succ\u00E8s en ciblant une nouvelle version, comme la suppression d\u2019API obsol\u00E8tes ou la modification des signatures de m\u00E9thode.",
+      "label": "Source incompatible avec la version .NET s\u00E9lectionn\u00E9e",
+      "severity": "Potential",
+      "effort": 1,
+      "links": [
+        {
+          "title": "Changements cassants dans .NET",
+          "url": "https://go.microsoft.com/fwlink/?linkid=2262679",
+          "isCustom": false
+        }
+      ]
+    },
+    "Api.0003": {
+      "id": "Api.0003",
+      "isFeature": false,
+      "description": "L\u2019API pr\u00E9sente un changement de comportement dans la version .NET s\u00E9lectionn\u00E9e\u00A0: le code et les binaires peuvent se comporter diff\u00E9remment \u00E0 l\u2019ex\u00E9cution sans n\u00E9cessiter de recompilation, mais ce nouveau comportement peut \u00EAtre ind\u00E9sirable et n\u00E9cessiter des mises \u00E0 jour.",
+      "label": "Modification du comportement dans la version .NET s\u00E9lectionn\u00E9e",
+      "severity": "Potential",
+      "effort": 1
+    }
+  }
+}
