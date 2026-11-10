@@ -9,6 +9,15 @@ public sealed class BrightSegmentDetector : ISaberDetector
 {
     public int BrightnessThreshold { get; set; } = 230;
 
+    /// <summary>Luminosité minimale d'un halo coloré émissif (n'importe quelle teinte).</summary>
+    public int GlowBrightness { get; set; } = 170;
+
+    /// <summary>Saturation minimale d'un halo coloré émissif ; une tenue sombre ou terne est rejetée sans connaître sa couleur.</summary>
+    public int GlowSaturation { get; set; } = 90;
+
+    /// <summary>Confiance minimale pour conserver un segment.</summary>
+    public double MinConfidence { get; set; } = 0.4;
+
     public double RoiMargin { get; set; } = 0.3;
 
     public double MinLengthRatio { get; set; } = 0.2;
@@ -38,9 +47,15 @@ public sealed class BrightSegmentDetector : ISaberDetector
 
             using var sub = new Mat(image, roi);
             using var hsv = new Mat();
+            using var core = new Mat();
+            using var glow = new Mat();
             using var mask = new Mat();
+            using var value = new Mat();
             Cv2.CvtColor(sub, hsv, ColorConversionCodes.BGR2HSV);
-            Cv2.InRange(hsv, new Scalar(0, 0, BrightnessThreshold), new Scalar(180, 255, 255), mask);
+            Cv2.InRange(hsv, new Scalar(0, 0, BrightnessThreshold), new Scalar(180, 255, 255), core);
+            Cv2.InRange(hsv, new Scalar(0, GlowSaturation, GlowBrightness), new Scalar(180, 255, 255), glow);
+            Cv2.BitwiseOr(core, glow, mask);
+            Cv2.ExtractChannel(hsv, value, 2);
             using var kernel = Cv2.GetStructuringElement(MorphShapes.Rect, new Size(3, 3));
             Cv2.MorphologyEx(mask, mask, MorphTypes.Open, kernel);
             Cv2.MorphologyEx(mask, mask, MorphTypes.Close, kernel);
@@ -48,16 +63,94 @@ public sealed class BrightSegmentDetector : ISaberDetector
             var minLength = Math.Max(10, MinLengthRatio * area.Height);
             var lines = Cv2.HoughLinesP(mask, 1, Math.PI / 180, 40, minLength, 10);
             var segs = lines
-                .Select(l => (A: new CorePoint(l.P1.X + x0, l.P1.Y + y0), B: new CorePoint(l.P2.X + x0, l.P2.Y + y0)))
+                .Select(l => (A: new CorePoint(l.P1.X, l.P1.Y), B: new CorePoint(l.P2.X, l.P2.Y)))
                 .ToList();
 
             foreach (var (a, b) in Merge(segs))
             {
-                result.Add(new SaberSegment(a, b, 1f));
+                var confidence = Score(mask, value, a, b, area.Height);
+                if (confidence >= MinConfidence)
+                {
+                    result.Add(new SaberSegment(new CorePoint(a.X + x0, a.Y + y0), new CorePoint(b.X + x0, b.Y + y0), (float)confidence));
+                }
             }
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Confiance (0..1) : continuité du trait lumineux le long du segment, contraste avec ses abords
+    /// (un sabre émet, il ressort sur le fond) et longueur relative au combattant. Aucune teinte n'est présupposée.
+    /// </summary>
+    private static double Score(Mat mask, Mat value, CorePoint a, CorePoint b, double areaHeight)
+    {
+        const int samples = 20;
+        const int offset = 5;
+        var dx = b.X - a.X;
+        var dy = b.Y - a.Y;
+        var len = Math.Sqrt((dx * dx) + (dy * dy));
+        if (len < 1)
+        {
+            return 0;
+        }
+
+        var nx = -dy / len;
+        var ny = dx / len;
+        var hits = 0;
+        double onLine = 0;
+        double besideLine = 0;
+        var counted = 0;
+        for (var i = 0; i <= samples; i++)
+        {
+            var t = i / (double)samples;
+            var x = a.X + (dx * t);
+            var y = a.Y + (dy * t);
+            if (!Inside(mask, x, y))
+            {
+                continue;
+            }
+
+            counted++;
+            if (NearMask(mask, x, y))
+            {
+                hits++;
+            }
+
+            onLine += Sample(value, x, y);
+            besideLine += (Sample(value, x + (nx * offset), y + (ny * offset)) + Sample(value, x - (nx * offset), y - (ny * offset))) / 2;
+        }
+
+        if (counted == 0)
+        {
+            return 0;
+        }
+
+        var coverage = hits / (double)counted;
+        var contrast = Math.Clamp((onLine - besideLine) / counted / 80.0, 0, 1);
+        var length = Math.Clamp(len / Math.Max(1, areaHeight), 0, 1);
+        return (0.5 * coverage) + (0.3 * contrast) + (0.2 * length);
+    }
+
+    private static bool Inside(Mat m, double x, double y) => x >= 0 && y >= 0 && x < m.Width && y < m.Height;
+
+    private static double Sample(Mat m, double x, double y) =>
+        Inside(m, x, y) ? m.At<byte>((int)y, (int)x) : 0;
+
+    private static bool NearMask(Mat mask, double x, double y)
+    {
+        for (var oy = -2; oy <= 2; oy++)
+        {
+            for (var ox = -2; ox <= 2; ox++)
+            {
+                if (Inside(mask, x + ox, y + oy) && mask.At<byte>((int)(y + oy), (int)(x + ox)) > 0)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private List<(CorePoint A, CorePoint B)> Merge(List<(CorePoint A, CorePoint B)> segs)

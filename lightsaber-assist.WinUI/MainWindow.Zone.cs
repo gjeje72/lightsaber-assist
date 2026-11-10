@@ -42,6 +42,7 @@ namespace lightsaber_assist.WinUI
                 return;
             }
 
+            DisplayMenuButton.Flyout?.Hide();
             calibrationPoints = [];
             StatusText.Text = CalibrationPrompts[0];
             overlayDirty = true;

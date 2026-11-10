@@ -26,7 +26,15 @@ public sealed record FightZone(PointF Center, float RadiusX, float RadiusY, IRea
     }
 
     /// <summary>Point au sol d'une détection : milieu du bas de la boîte.</summary>
-    public bool ContainsFeet(BoundingBox box) => Contains(new PointF(box.X + (box.Width / 2f), box.Bottom));
+    public bool ContainsFeet(BoundingBox box, float margin = 1.1f) => Contains(new PointF(box.X + (box.Width / 2f), box.Bottom), margin);
+
+    /// <summary>Marge large pour le suivi : les combattants évoluent souvent sur ou au-delà de la ligne du ring.</summary>
+    public const float TrackingMargin = 1.4f;
+
+    /// <summary>Signature courte de la zone, utilisée pour distinguer les analyses en cache.</summary>
+    public string Signature =>
+        FormattableString.Invariant($"z{Center.X:0}.{Center.Y:0}.{RadiusX:0}.{RadiusY:0}")
+        + string.Concat(FighterSeeds.Select(s => FormattableString.Invariant($".s{s.X:0}.{s.Y:0}")));
 
     /// <summary>
     /// Indique si un segment longe le cercle lumineux (la majorit\u00e9 de ses points sont sur l'ellipse) :

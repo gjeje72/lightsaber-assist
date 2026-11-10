@@ -53,7 +53,7 @@
                              VerticalAlignment="Center" />
                 <ToggleSwitch x:Name="RealtimeToggle" Grid.Column="4" OnContent="Temps réel" OffContent="Temps réel"
                               Toggled="Realtime_Toggled" MinWidth="0" />
-                <DropDownButton Grid.Column="5" Content="Affichage">
+                <DropDownButton x:Name="DisplayMenuButton" Grid.Column="5" Content="Affichage">
                     <DropDownButton.Flyout>
                         <Flyout Placement="BottomEdgeAlignedRight">
                             <StackPanel Spacing="4" MinWidth="220">

@@ -21,7 +21,9 @@ namespace lightsaber_assist.WinUI
     {
         private const string ModelName = "yolo11n-pose";
         private const string ModelFileName = ModelName + ".onnx";
-        private const string AnalysisVersion = ModelName + "+saber2";
+        private const string AnalysisVersion = ModelName + "+track4+saber3";
+
+        private string CurrentAnalysisVersion => fightZone is null ? AnalysisVersion : AnalysisVersion + "+" + fightZone.Signature;
         private readonly ISaberDetector saberDetector = new BrightSegmentDetector();
 
         private readonly Dictionary<int, FrameAnalysis> analyses = [];
@@ -192,7 +194,7 @@ namespace lightsaber_assist.WinUI
                     StatusText.Text = text;
                 });
                 var result = await new VideoPreAnalyzer(source, det, saberDetector, fightZone)
-                    .AnalyzeAsync(videoPath, AnalysisVersion, 1, progress, token);
+                    .AnalyzeAsync(videoPath, CurrentAnalysisVersion, 1, progress, token);
 
                 analyses.Clear();
                 foreach (var f in result.Frames)
@@ -504,7 +506,7 @@ namespace lightsaber_assist.WinUI
                     Width = videoInfo?.Width ?? 0,
                     Height = videoInfo?.Height ?? 0,
                     Fps = videoInfo?.Fps ?? 0,
-                    ModelVersion = AnalysisVersion,
+                    ModelVersion = CurrentAnalysisVersion,
                     Frames = analyses.Values.OrderBy(f => f.FrameIndex).ToList(),
                     Annotations = annotations.ToList(),
                 };
