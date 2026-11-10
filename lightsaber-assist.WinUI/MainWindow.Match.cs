@@ -79,8 +79,13 @@ namespace lightsaber_assist.WinUI
             }
 
             var checks = groups.Select(g => new CheckBox { Content = g.DisplayName, Tag = g }).ToList();
-            var name1 = new TextBox { Header = "Combattant 1 (rouge)", PlaceholderText = "Nom" };
-            var name2 = new TextBox { Header = "Combattant 2 (bleu)", PlaceholderText = "Nom" };
+            var matchName = new TextBox { Header = "Nom du match", PlaceholderText = "Ex. : Quart de finale 1/3" };
+            var first1 = new TextBox { Header = "Combattant rouge (à gauche de l'arbitre) - Prénom", PlaceholderText = "Prénom" };
+            var last1 = new TextBox { Header = "Nom", PlaceholderText = "Nom" };
+            var country1 = new TextBox { Header = "Nationalité (code, ex. FRA)", PlaceholderText = "FRA", MaxLength = 3 };
+            var first2 = new TextBox { Header = "Combattant vert (à droite de l'arbitre) - Prénom", PlaceholderText = "Prénom" };
+            var last2 = new TextBox { Header = "Nom", PlaceholderText = "Nom" };
+            var country2 = new TextBox { Header = "Nationalité (code, ex. FRA)", PlaceholderText = "FRA", MaxLength = 3 };
             var hint = new TextBlock { Text = "Sélectionnez de 1 à 3 caméras.", TextWrapping = TextWrapping.Wrap };
             var panel = new StackPanel { Spacing = 8, MinWidth = 360 };
             panel.Children.Add(new TextBlock { Text = "Caméras", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
@@ -91,8 +96,13 @@ namespace lightsaber_assist.WinUI
             }
 
             panel.Children.Add(new TextBlock { Text = "Combattants", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Margin = new Thickness(0, 8, 0, 0) });
-            panel.Children.Add(name1);
-            panel.Children.Add(name2);
+            panel.Children.Add(matchName);
+            panel.Children.Add(first1);
+            panel.Children.Add(last1);
+            panel.Children.Add(country1);
+            panel.Children.Add(first2);
+            panel.Children.Add(last2);
+            panel.Children.Add(country2);
 
             var dialog = new ContentDialog
             {
@@ -124,13 +134,32 @@ namespace lightsaber_assist.WinUI
             }
 
             var selected = checks.Where(c => c.IsChecked == true).Select(c => (MediaFrameSourceGroup)c.Tag).ToList();
-            await StartMatchAsync(selected, [name1.Text.Trim(), name2.Text.Trim()]);
+            await StartMatchAsync(
+                selected,
+                [
+                    new FighterInfo(first1.Text.Trim(), last1.Text.Trim(), country1.Text.Trim()),
+                    new FighterInfo(first2.Text.Trim(), last2.Text.Trim(), country2.Text.Trim()),
+                ],
+                matchName.Text.Trim());
         }
 
-        private async Task StartMatchAsync(IReadOnlyList<MediaFrameSourceGroup> groups, string[] names)
+        private void ShowMatchInfo(FighterInfo[] fighters, string matchTitle)
+        {
+            Fighter1Name.Text = fighters[0].DisplayName;
+            Fighter2Name.Text = fighters[1].DisplayName;
+            Fighter1Country.Text = fighters[0].CountryCode;
+            Fighter2Country.Text = fighters[1].CountryCode;
+            Fighter1Flag.Source = fighters[0].FlagUri is { } u1 ? new BitmapImage(u1) : null;
+            Fighter2Flag.Source = fighters[1].FlagUri is { } u2 ? new BitmapImage(u2) : null;
+            MatchTitleText.Text = matchTitle;
+            MatchInfoBar.Visibility = Visibility.Visible;
+        }
+
+        private async Task StartMatchAsync(IReadOnlyList<MediaFrameSourceGroup> groups, FighterInfo[] fighters, string matchTitle)
         {
             StopLive();
-            fighterNames = names;
+            fighterNames = fighters.Select(f => f.DisplayName).ToArray();
+            ShowMatchInfo(fighters, matchTitle);
             analysisCts?.Cancel();
             Player.MediaPlayer?.Pause();
             frameSource?.Dispose();
@@ -177,7 +206,7 @@ namespace lightsaber_assist.WinUI
 
             var f1 = string.IsNullOrWhiteSpace(fighterNames[0]) ? "Combattant 1" : fighterNames[0];
             var f2 = string.IsNullOrWhiteSpace(fighterNames[1]) ? "Combattant 2" : fighterNames[1];
-            MatchText.Text = $"Rouge : {f1}   |   Bleu : {f2}   |   {liveSessions.Count} caméra(s)";
+            MatchText.Text = $"Rouge : {f1}   |   Vert : {f2}   |   {liveSessions.Count} caméra(s)";
             ModeButton.Content = "Match en direct";
 
             try
@@ -221,6 +250,7 @@ namespace lightsaber_assist.WinUI
 
             liveSessions.Clear();
             fighterNames = [];
+            MatchInfoBar.Visibility = Visibility.Collapsed;
             lock (replayLock)
             {
                 replayBuffer.Clear();

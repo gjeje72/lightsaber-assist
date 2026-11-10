@@ -340,7 +340,7 @@ namespace lightsaber_assist.WinUI
 
             foreach (var fighter in analysis.Fighters)
             {
-                var brush = new SolidColorBrush(fighter.FighterId == 0 ? Colors.OrangeRed : Colors.DeepSkyBlue);
+                var brush = new SolidColorBrush(fighter.FighterId == 0 ? Colors.OrangeRed : Colors.LimeGreen);
 
                 if (fighter.FighterId < fighterNames.Length && !string.IsNullOrWhiteSpace(fighterNames[fighter.FighterId]))
                 {

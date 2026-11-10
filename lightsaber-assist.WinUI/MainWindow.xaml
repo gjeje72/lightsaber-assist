@@ -75,7 +75,7 @@
 
         <TextBlock x:Name="StatusText" Grid.Row="1" Grid.Column="0" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
 
-        <Grid Grid.Row="2" Grid.Column="0" RowDefinitions="*,Auto" RowSpacing="8">
+        <Grid Grid.Row="2" Grid.Column="0" RowDefinitions="*,Auto,Auto" RowSpacing="8">
             <ScrollViewer x:Name="ZoomHost" Grid.Row="0" ZoomMode="Enabled" MinZoomFactor="1" MaxZoomFactor="8"
                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                           HorizontalScrollMode="Enabled" VerticalScrollMode="Enabled">
@@ -117,6 +117,26 @@
                         </StackPanel>
                     </Button>
                     <Button Grid.Column="3" Content="Terminer le match" Click="EndMatch_Click" />
+                </Grid>
+            </Border>
+
+            <Border x:Name="MatchInfoBar" Grid.Row="2" Visibility="Collapsed" CornerRadius="12" Padding="12,8" Background="#E6202020">
+                <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12">
+                    <Border Grid.Column="0" CornerRadius="8" Padding="12,6" Background="#CCB71C1C">
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <TextBlock x:Name="Fighter1Country" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                            <Image x:Name="Fighter1Flag" Height="20" VerticalAlignment="Center" />
+                            <TextBlock x:Name="Fighter1Name" Foreground="White" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock x:Name="MatchTitleText" Grid.Column="1" Foreground="White" FontWeight="SemiBold" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    <Border Grid.Column="2" CornerRadius="8" Padding="12,6" Background="#CC1B7A2F">
+                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Right">
+                            <TextBlock x:Name="Fighter2Name" Foreground="White" FontWeight="SemiBold" FontSize="18" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                            <Image x:Name="Fighter2Flag" Height="20" VerticalAlignment="Center" />
+                            <TextBlock x:Name="Fighter2Country" Foreground="White" FontSize="12" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Border>
                 </Grid>
             </Border>
 
